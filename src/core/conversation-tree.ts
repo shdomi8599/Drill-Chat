@@ -37,6 +37,8 @@ export function createMessage(
  */
 export function createSubConversation(
   drillTarget: DrillTarget,
+  index: number = 1,
+  color: string = '#818cf8', // Default Indigo
 ): SubConversation {
   return {
     id: uuid(),
@@ -44,6 +46,8 @@ export function createSubConversation(
     anchorRange: { ...drillTarget.range },
     messages: [],
     status: 'active',
+    index,
+    color,
     createdAt: Date.now(),
   };
 }

@@ -6,6 +6,7 @@ import type {
   SubMessage,
 } from '@/core/types';
 import { createSubConversation } from '@/core/conversation-tree';
+import { getDrillColor } from '@/core/colors';
 
 // ── Active Sub-Conversation State ──
 
@@ -39,6 +40,11 @@ interface ChatState {
     messageId: string,
     rootAnswer: string,
     drillTarget: DrillTarget,
+  ) => void;
+  openSubConversationById: (
+    messageId: string,
+    subConvId: string,
+    rootAnswer: string,
   ) => void;
   closeSubConversation: () => void;
 
@@ -102,9 +108,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       });
       return;
     }
-
     // Create new sub-conversation
-    const newSubConv: SubConversation = createSubConversation(drillTarget);
+    const index = existingIds.length + 1;
+    const color = getDrillColor(index);
+    const newSubConv: SubConversation = createSubConversation(drillTarget, index, color);
 
     set((s) => ({
       activeSubConversation: {
@@ -122,6 +129,25 @@ export const useChatStore = create<ChatState>((set, get) => ({
         [messageId]: [...(s.messageSubConvMap[messageId] || []), newSubConv.id],
       },
     }));
+  },
+
+  openSubConversationById: (messageId, subConvId, rootAnswer) => {
+    const { subConversations } = get();
+    const existing = subConversations[subConvId];
+    if (existing) {
+      set({
+        activeSubConversation: {
+          messageId,
+          subConvId,
+          drillTarget: {
+            text: existing.anchorText,
+            range: existing.anchorRange,
+            trigger: 'text-selection', // default mapping
+          },
+          rootAnswer,
+        },
+      });
+    }
   },
 
   closeSubConversation: () => {

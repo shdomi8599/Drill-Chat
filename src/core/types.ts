@@ -31,6 +31,10 @@ export interface SubConversation {
   syncedContent?: string;
   /** The original content before sync-back (for diff) */
   originalContent?: string;
+ /** Order in messages (1-based index) */
+  index: number;
+  /** Assigned theme color (hex or CSS variable) */
+  color: string;
   /** Timestamp */
   createdAt: number;
 }

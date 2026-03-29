@@ -23,7 +23,7 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, isStreaming, onDrill }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const contentRef = useRef<HTMLDivElement>(null);
-  const { getSubConversationsForMessage } = useChatStore();
+  const { getSubConversationsForMessage, openSubConversationById } = useChatStore();
 
   // Extract text content from message parts
   const textContent = message.parts
@@ -35,10 +35,12 @@ export function MessageBubble({ message, isStreaming, onDrill }: MessageBubblePr
   const subConvs = getSubConversationsForMessage(message.id);
   const activeAnchors = subConvs
     .filter((sc: SubConversation) => sc.status === 'active')
-    .map((sc: SubConversation) => sc.anchorText);
-  const syncedAnchors = subConvs
-    .filter((sc: SubConversation) => sc.status === 'synced')
-    .map((sc: SubConversation) => sc.anchorText);
+    .map((sc: SubConversation) => ({
+      text: sc.anchorText,
+      color: sc.color,
+      index: sc.index,
+      subConvId: sc.id,
+    }));
 
   const handleDrill = useCallback(
     (target: DrillTarget) => {
@@ -66,6 +68,7 @@ export function MessageBubble({ message, isStreaming, onDrill }: MessageBubblePr
             <DrillableContent
               content={textContent}
               onDrill={handleDrill}
+              onReopen={(subConvId) => openSubConversationById(message.id, subConvId, textContent)}
               drillEnabled={!isStreaming}
               activeAnchors={activeAnchors}
             />
@@ -78,10 +81,17 @@ export function MessageBubble({ message, isStreaming, onDrill }: MessageBubblePr
                   <span
                     key={sc.id}
                     className={`sub-indicator sub-indicator-${sc.status}`}
+                    style={{ '--drill-accent': sc.color, cursor: 'pointer' } as React.CSSProperties}
                     title={`"${sc.anchorText.slice(0, 30)}…" — ${sc.status}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openSubConversationById(message.id, sc.id, textContent);
+                    }}
                   >
                     <MessageSquare size={10} />
-                    <span>{sc.status === 'synced' ? 'Synced' : 'Active'}</span>
+                    <span>
+                      {sc.status === 'synced' ? 'Synced' : `Drill #${sc.index}`}
+                    </span>
                   </span>
                 ))}
               </div>

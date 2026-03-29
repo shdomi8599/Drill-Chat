@@ -29,7 +29,7 @@ interface SubConversationPanelProps {
 export function SubConversationPanel({
   onSyncBack,
 }: SubConversationPanelProps) {
-  const { activeSubConversation } = useChatStore();
+  const { activeSubConversation, subConversations } = useChatStore();
   const [input, setInput] = useState('');
   const [panelHeight, setPanelHeight] = useState(400);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -44,6 +44,8 @@ export function SubConversationPanel({
         }
       },
     });
+
+  const subConv = activeSubConversation ? subConversations[activeSubConversation.subConvId] : null;
 
   // Auto-scroll messages
   useEffect(() => {
@@ -112,7 +114,10 @@ export function SubConversationPanel({
       {/* Panel */}
       <div
         className="sub-panel"
-        style={{ height: panelHeight }}
+        style={{ 
+          height: panelHeight,
+          '--drill-accent': subConv?.color || 'var(--accent)',
+        } as React.CSSProperties}
       >
         {/* Drag handle */}
         <div className="sub-panel-drag" onMouseDown={handleDragStart}>
@@ -122,9 +127,12 @@ export function SubConversationPanel({
         {/* Header */}
         <div className="sub-panel-header">
           <div className="sub-panel-header-left">
-            <MessageSquare size={16} />
+            <div className="sub-panel-icon">
+              <MessageSquare size={16} />
+              {subConv && <span className="sub-panel-index">{subConv.index}</span>}
+            </div>
             <div className="sub-panel-header-info">
-              <span className="sub-panel-label">Sub-conversation</span>
+              <span className="sub-panel-label">SUB-CONVERSATION {subConv && `#${subConv.index}`}</span>
               <span className="sub-panel-anchor" title={drillTarget.text}>
                 &ldquo;{drillTarget.text.length > 60
                   ? drillTarget.text.slice(0, 60) + '…'

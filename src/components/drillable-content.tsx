@@ -20,8 +20,10 @@ interface DrillableContentProps {
   onDrill: (target: DrillTarget) => void;
   /** Whether drill buttons should be shown */
   drillEnabled?: boolean;
-  /** IDs of anchors that already have active sub-conversations */
-  activeAnchors?: string[];
+  /** Called when the user clicks an active anchor to reopen it */
+  onReopen?: (subConvId: string) => void;
+  /** Anchors that already have active sub-conversations */
+  activeAnchors?: { text: string; color: string; index: number; subConvId: string }[];
 }
 
 /**
@@ -31,6 +33,7 @@ interface DrillableContentProps {
 export function DrillableContent({
   content,
   onDrill,
+  onReopen,
   drillEnabled = true,
   activeAnchors = [],
 }: DrillableContentProps) {
@@ -55,12 +58,29 @@ export function DrillableContent({
   const components: Components = {
     li: ({ children, ...props }) => {
       const text = extractTextFromChildren(children);
-      const isActive = activeAnchors.some((a) => text.includes(a));
+      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
 
       return (
-        <li {...props} className={`drillable-item ${isActive ? 'drillable-active' : ''}`}>
-          <span className="drillable-item-content">{children}</span>
-          {drillEnabled && text.length > 10 && (
+        <li
+          {...props}
+          className={`drillable-item ${activeInfo ? 'drillable-active' : ''}`}
+          style={activeInfo ? ({ '--drill-accent': activeInfo.color, cursor: 'pointer' } as React.CSSProperties) : {}}
+          onClick={(e) => {
+            if (activeInfo && onReopen) {
+              e.stopPropagation();
+              onReopen(activeInfo.subConvId);
+            }
+          }}
+        >
+          <span className="drillable-item-content">
+            {activeInfo && (
+              <span className="drill-index-chip">
+                {activeInfo.index}
+              </span>
+            )}
+            {children}
+          </span>
+          {drillEnabled && text.length > 10 && !activeInfo && (
             <button
               className="drill-btn"
               onClick={(e) => {
@@ -79,10 +99,27 @@ export function DrillableContent({
     },
     h2: ({ children, ...props }) => {
       const text = extractTextFromChildren(children);
+      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
+
       return (
-        <h2 {...props} className="drillable-heading">
+        <h2
+          {...props}
+          className={`drillable-heading ${activeInfo ? 'drillable-active' : ''}`}
+          style={activeInfo ? ({ '--drill-accent': activeInfo.color, cursor: 'pointer' } as React.CSSProperties) : {}}
+          onClick={(e) => {
+            if (activeInfo && onReopen) {
+              e.stopPropagation();
+              onReopen(activeInfo.subConvId);
+            }
+          }}
+        >
+          {activeInfo && (
+            <span className="drill-index-chip">
+              {activeInfo.index}
+            </span>
+          )}
           {children}
-          {drillEnabled && (
+          {drillEnabled && !activeInfo && (
             <button
               className="drill-btn drill-btn-heading"
               onClick={(e) => {
@@ -99,10 +136,27 @@ export function DrillableContent({
     },
     h3: ({ children, ...props }) => {
       const text = extractTextFromChildren(children);
+      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
+
       return (
-        <h3 {...props} className="drillable-heading">
+        <h3
+          {...props}
+          className={`drillable-heading ${activeInfo ? 'drillable-active' : ''}`}
+          style={activeInfo ? ({ '--drill-accent': activeInfo.color, cursor: 'pointer' } as React.CSSProperties) : {}}
+          onClick={(e) => {
+            if (activeInfo && onReopen) {
+              e.stopPropagation();
+              onReopen(activeInfo.subConvId);
+            }
+          }}
+        >
+          {activeInfo && (
+            <span className="drill-index-chip">
+              {activeInfo.index}
+            </span>
+          )}
           {children}
-          {drillEnabled && (
+          {drillEnabled && !activeInfo && (
             <button
               className="drill-btn drill-btn-heading"
               onClick={(e) => {
