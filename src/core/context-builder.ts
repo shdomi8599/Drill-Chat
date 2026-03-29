@@ -79,6 +79,49 @@ ${historyText}
 Now return the complete updated answer with the sub-conversation insights integrated:`;
 }
 
+// ── Partial Sync-back Prompt ──
+
+/**
+ * Generates a prompt for partial sync-back.
+ * Instead of rewriting the entire answer, the LLM only rewrites
+ * the relevant section — reducing output tokens by up to ~75%.
+ */
+export function buildPartialSyncBackPrompt(
+  sectionContent: string,
+  anchorText: string,
+  surroundingContext: string,
+  subConversationHistory: { role: string; content: string }[],
+): string {
+  const historyText = subConversationHistory
+    .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+    .join('\n\n');
+
+  return `Below is a SECTION from an AI answer and a sub-conversation the user had about "${anchorText}".
+
+Rewrite ONLY this section with the new insights from the sub-conversation integrated.
+
+Rules:
+1. Return ONLY the rewritten section — do NOT include any other parts of the answer.
+2. Enrich the section with information from the sub-conversation.
+3. Maintain the exact same formatting style (markdown, numbered lists, blockquotes, etc.).
+4. Do NOT add artificial markers like ★Enhanced★ — make it read naturally.
+5. Keep the same overall length unless the new information requires expansion.
+
+--- SURROUNDING CONTEXT ---
+${surroundingContext}
+--- END SURROUNDING CONTEXT ---
+
+--- SECTION TO REWRITE ---
+${sectionContent}
+--- END SECTION ---
+
+--- SUB-CONVERSATION about "${anchorText}" ---
+${historyText}
+--- END SUB-CONVERSATION ---
+
+Now return the rewritten section:`;
+}
+
 // ── Context Package ──
 
 /**

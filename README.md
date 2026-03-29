@@ -18,10 +18,10 @@ Drill-Chat transforms this structure into an **explorable tree**:
 
 ## ✨ Core Features
 
-- **Inline Sub-Conversations** — Click or drag-select specific items within an answer to open a sub-conversation and explore in depth
-- **Sync-back** — Automatically integrate insights from sub-conversations back into the original answer
-- **Multi-LLM Support** — Supports OpenAI GPT-4o, Anthropic Claude, and Google Gemini
-- **Tree-structured Conversations** — Manage conversations as tree structures to prevent context loss
+- **Inline Sub-Conversations** — Click or drag-select specific items within an answer to open a sub-conversation and explore in depth.
+- **Surgical Sync-back** — Automatically integrate insights from sub-conversations back into the original answer. Instead of fully regenerating the AI's original answer, it surgically rewrites only the targeted section using a markdown boundary parser, reducing output tokens by up to **~75%**.
+- **Multi-LLM Support** — Supports OpenAI GPT-4o, Anthropic Claude, and Google Gemini.
+- **Tree-structured Conversations** — Manage conversations as tree structures to prevent context loss.
 
 ## 🔧 Tech Stack
 

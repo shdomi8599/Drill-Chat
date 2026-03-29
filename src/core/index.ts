@@ -41,9 +41,17 @@ export {
 export {
   buildSubConversationSystemPrompt,
   buildSyncBackPrompt,
+  buildPartialSyncBackPrompt,
   buildSubConversationContext,
   buildSubConversationApiMessages,
 } from './context-builder';
+
+// Section parser (for partial sync-back)
+export {
+  findSectionBoundary,
+  spliceSection,
+} from './section-parser';
+export type { SectionBoundary } from './section-parser';
 
 // Sync-back
 export {
