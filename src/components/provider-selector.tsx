@@ -1,29 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useChatStore } from '@/lib/chat-store';
-import type { LLMProvider, LLMProviderConfig } from '@/core/types';
-import { ChevronDown } from 'lucide-react';
+import { PROVIDER_CONFIGS } from '@/lib/llm-providers';
+import type { LLMProvider } from '@/core/types';
+import { ChevronDown, Check } from 'lucide-react';
 
 export function ProviderSelector() {
-  const { provider, setProvider } = useChatStore();
-  const [providers, setProviders] = useState<LLMProviderConfig[]>([]);
+  const { provider, setProvider, apiKeys } = useChatStore();
   const [open, setOpen] = useState(false);
 
-  // Fetch available providers on mount
-  useEffect(() => {
-    fetch('/api/providers')
-      .then((res) => res.json())
-      .then(({ providers: p, defaultProvider }) => {
-        setProviders(p);
-        if (defaultProvider) {
-          setProvider(defaultProvider);
-        }
-      })
-      .catch(console.error);
-  }, [setProvider]);
+  const providers: LLMProvider[] = ['google', 'openai', 'anthropic'];
 
-  const current = providers.find((p) => p.id === provider);
+  const current = PROVIDER_CONFIGS[provider];
 
   const handleSelect = (id: LLMProvider) => {
     setProvider(id);
@@ -45,20 +34,27 @@ export function ProviderSelector() {
         <>
           <div className="provider-backdrop" onClick={() => setOpen(false)} />
           <div className="provider-dropdown">
-            {providers.map((p) => (
-              <button
-                key={p.id}
-                className={`provider-option ${p.id === provider ? 'active' : ''} ${!p.available ? 'disabled' : ''}`}
-                onClick={() => p.available && handleSelect(p.id)}
-                disabled={!p.available}
-              >
-                <span className="provider-option-name">{p.name}</span>
-                <span className="provider-option-model">{p.model}</span>
-                {!p.available && (
-                  <span className="provider-option-badge">No API Key</span>
-                )}
-              </button>
-            ))}
+            {providers.map((p) => {
+              const config = PROVIDER_CONFIGS[p];
+              const hasKey = !!apiKeys[p];
+              return (
+                <button
+                  key={p}
+                  className={`provider-option ${p === provider ? 'active' : ''} ${!hasKey ? 'disabled' : ''}`}
+                  onClick={() => hasKey && handleSelect(p)}
+                  disabled={!hasKey}
+                >
+                  <span className="provider-option-name">{config.name}</span>
+                  <span className="provider-option-model">{config.model}</span>
+                  {!hasKey && (
+                    <span className="provider-option-badge">No Key</span>
+                  )}
+                  {p === provider && hasKey && (
+                    <Check size={14} className="provider-check" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </>
       )}

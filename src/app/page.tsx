@@ -13,12 +13,14 @@ import { useCallback, useRef } from 'react';
 
 export default function Home() {
   const provider = useChatStore((s) => s.provider);
+  const getApiKeyHeader = useChatStore((s) => s.getApiKeyHeader);
 
   const { messages, sendMessage, status, stop, error, regenerate, setMessages } =
     useChat({
       transport: new DefaultChatTransport({
         api: '/api/chat',
         body: { provider },
+        headers: getApiKeyHeader(),
       }),
     });
 

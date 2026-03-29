@@ -1,6 +1,5 @@
 import { streamText, UIMessage, convertToModelMessages } from 'ai';
-import { getModel } from '@/lib/llm-providers';
-import type { LLMProvider } from '@/core/types';
+import { getModelWithKey, extractKeyFromHeaders } from '@/lib/llm-providers';
 import { buildSubConversationSystemPrompt } from '@/core/context-builder';
 
 // Allow streaming responses up to 60 seconds
@@ -13,11 +12,13 @@ so users can easily identify and explore specific parts of your answer.
 Be concise but thorough. Use headings, bullet points, and numbered lists where appropriate.`;
 
 export async function POST(req: Request) {
+  // Extract API key from headers (BYOK)
+  const { provider, apiKey } = extractKeyFromHeaders(req);
+
   const body = await req.json();
 
   const {
     messages,
-    provider = 'google',
     // Sub-conversation fields
     isSubConversation = false,
     rootAnswer,
@@ -26,7 +27,6 @@ export async function POST(req: Request) {
     newUserMessage,
   }: {
     messages?: UIMessage[];
-    provider?: LLMProvider;
     isSubConversation?: boolean;
     rootAnswer?: string;
     anchorText?: string;
@@ -34,11 +34,17 @@ export async function POST(req: Request) {
     newUserMessage?: string;
   } = body;
 
-  const model = getModel(provider);
+  if (!apiKey) {
+    return new Response(
+      JSON.stringify({ error: 'API key is required. Please add your key in Settings.' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
+  const model = getModelWithKey(provider, apiKey);
 
   if (isSubConversation && rootAnswer && anchorText && newUserMessage) {
     // ── Sub-conversation mode ──
-    // Build a separate message history with sub-conversation context
     const systemPrompt = buildSubConversationSystemPrompt(rootAnswer, anchorText);
 
     const subConvMessages: { role: 'user' | 'assistant'; content: string }[] = [

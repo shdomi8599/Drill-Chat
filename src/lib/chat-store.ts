@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type {
   LLMProvider,
   DrillTarget,
@@ -29,6 +30,11 @@ interface ChatState {
   // ── Provider ──
   provider: LLMProvider;
   setProvider: (provider: LLMProvider) => void;
+
+  // ── API Keys (BYOK) ──
+  apiKeys: Record<LLMProvider, string>;
+  setApiKey: (provider: LLMProvider, key: string) => void;
+  getApiKeyHeader: () => Record<string, string>;
 
   // ── Sidebar ──
   sidebarOpen: boolean;
@@ -71,10 +77,26 @@ interface ChatState {
   setSyncBackInProgress: (v: boolean) => void;
 }
 
-export const useChatStore = create<ChatState>((set, get) => ({
+export const useChatStore = create<ChatState>()(
+  persist(
+    (set, get) => ({
   // ── Provider ──
   provider: 'google',
   setProvider: (provider) => set({ provider }),
+
+  // ── API Keys (BYOK) ──
+  apiKeys: { google: '', openai: '', anthropic: '' },
+  setApiKey: (provider, key) =>
+    set((s) => ({
+      apiKeys: { ...s.apiKeys, [provider]: key },
+    })),
+  getApiKeyHeader: () => {
+    const { provider, apiKeys } = get();
+    const key = apiKeys[provider];
+    const headers: Record<string, string> = { 'x-provider': provider };
+    if (key) headers['x-api-key'] = key;
+    return headers;
+  },
 
   // ── Sidebar ──
   sidebarOpen: false,
@@ -248,4 +270,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // ── Sync-back ──
   syncBackInProgress: false,
   setSyncBackInProgress: (v) => set({ syncBackInProgress: v }),
-}));
+}),
+    {
+      name: 'drill-chat-settings',
+      partialize: (state: ChatState) => ({
+        apiKeys: state.apiKeys,
+        provider: state.provider,
+      }),
+    },
+  ),
+);

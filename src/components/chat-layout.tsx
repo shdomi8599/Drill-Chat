@@ -11,7 +11,8 @@ import { MessageBubble } from './message-bubble';
 import { ChatInput } from './chat-input';
 import { ProviderSelector } from './provider-selector';
 import { SubConversationPanel } from './sub-conversation-panel';
-import { Drill, CheckCircle2 } from 'lucide-react';
+import { ApiKeySettings } from './api-key-settings';
+import { Drill, CheckCircle2, Settings } from 'lucide-react';
 import { useChatStore } from '@/lib/chat-store';
 import type { DrillTarget } from '@/core/types';
 
@@ -36,7 +37,8 @@ export function ChatLayout({
   onSyncBack,
 }: ChatLayoutProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { activeSubConversation, openSubConversation } = useChatStore();
+  const { activeSubConversation, openSubConversation, apiKeys } = useChatStore();
+  const hasAnyKey = Object.values(apiKeys).some((k) => k.length > 0);
 
   // Sync-back feedback state
   const [syncedMessageId, setSyncedMessageId] = useState<string | null>(null);
@@ -98,7 +100,10 @@ export function ChatLayout({
           <h1 className="chat-title">Drill-Chat</h1>
           <span className="chat-badge">alpha</span>
         </div>
-        <ProviderSelector />
+        <div className="chat-header-right">
+          <ProviderSelector />
+          <ApiKeySettings />
+        </div>
       </header>
 
       {/* Messages Area */}
@@ -108,7 +113,7 @@ export function ChatLayout({
             <div className="chat-empty-icon">
               <Drill size={48} />
             </div>
-            <h2>Welcome to Drill-Chat</h2>
+            <h2>Welcome to Drill Chat</h2>
             <p>
               Ask anything. Click on specific parts of AI answers to drill
               deeper.
@@ -118,6 +123,12 @@ export function ChatLayout({
               <span className="hint-item">📝 Drag-select text for custom drill</span>
               <span className="hint-item">🔄 Sync insights back to the original</span>
             </div>
+            {!hasAnyKey && (
+              <div className="chat-key-notice">
+                <Settings size={16} />
+                <span>Add your API key in <strong>Settings</strong> (⚙ top-right) to start chatting.</span>
+              </div>
+            )}
           </div>
         )}
 

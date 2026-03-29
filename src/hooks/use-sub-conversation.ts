@@ -45,6 +45,7 @@ export function useSubConversation(
     addSubMessage,
     updateSubConvStatus,
     setSubConvLoading,
+    getApiKeyHeader,
     closeSubConversation,
     syncBackInProgress,
     setSyncBackInProgress,
@@ -72,7 +73,7 @@ export function useSubConversation(
       try {
         const res = await fetch('/api/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...getApiKeyHeader() },
           body: JSON.stringify({
             provider,
             isSubConversation: true,
@@ -129,7 +130,7 @@ export function useSubConversation(
     try {
       const res = await fetch('/api/sync-back', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getApiKeyHeader() },
         body: JSON.stringify({
           originalAnswer: activeSubConversation.rootAnswer,
           anchorText: activeSubConversation.drillTarget.text,

@@ -3,10 +3,11 @@
 // ============================================
 // Supports Google Gemini, OpenAI GPT, Anthropic Claude
 // Uses Vercel AI SDK for unified streaming interface
+// BYOK: Users can provide their own API keys
 
-import { google } from '@ai-sdk/google';
-import { openai } from '@ai-sdk/openai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import type { LLMProvider, LLMProviderConfig } from '@/core/types';
 
 // ── Provider Configurations ──
@@ -15,7 +16,7 @@ export const PROVIDER_CONFIGS: Record<LLMProvider, LLMProviderConfig> = {
   google: {
     id: 'google',
     name: 'Google Gemini',
-    model: 'gemini-3.1-flash-lite-preview',
+    model: 'gemini-2.5-flash-preview-05-20',
     available: false,
   },
   openai: {
@@ -32,44 +33,53 @@ export const PROVIDER_CONFIGS: Record<LLMProvider, LLMProviderConfig> = {
   },
 };
 
-// ── Check which providers have API keys configured ──
+// ── Get the AI SDK model instance for a provider with a custom API key ──
 
-export function getAvailableProviders(): LLMProviderConfig[] {
-  const configs = { ...PROVIDER_CONFIGS };
-
-  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    configs.google = { ...configs.google, available: true };
-  }
-  if (process.env.OPENAI_API_KEY) {
-    configs.openai = { ...configs.openai, available: true };
-  }
-  if (process.env.ANTHROPIC_API_KEY) {
-    configs.anthropic = { ...configs.anthropic, available: true };
-  }
-
-  return Object.values(configs);
-}
-
-export function getDefaultProvider(): LLMProvider {
-  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) return 'google';
-  if (process.env.OPENAI_API_KEY) return 'openai';
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
-  return 'google'; // fallback
-}
-
-// ── Get the AI SDK model instance for a provider ──
-
-export function getModel(provider: LLMProvider) {
+export function getModelWithKey(provider: LLMProvider, apiKey?: string) {
   const config = PROVIDER_CONFIGS[provider];
 
   switch (provider) {
-    case 'google':
+    case 'google': {
+      const google = createGoogleGenerativeAI({
+        apiKey: apiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY || '',
+      });
       return google(config.model);
-    case 'openai':
+    }
+    case 'openai': {
+      const openai = createOpenAI({
+        apiKey: apiKey || process.env.OPENAI_API_KEY || '',
+      });
       return openai(config.model);
-    case 'anthropic':
+    }
+    case 'anthropic': {
+      const anthropic = createAnthropic({
+        apiKey: apiKey || process.env.ANTHROPIC_API_KEY || '',
+      });
       return anthropic(config.model);
+    }
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }
+}
+
+/**
+ * Extract provider and API key from request headers.
+ */
+export function extractKeyFromHeaders(req: Request): {
+  provider: LLMProvider;
+  apiKey?: string;
+} {
+  const provider = (req.headers.get('x-provider') || 'google') as LLMProvider;
+  const apiKey = req.headers.get('x-api-key') || undefined;
+  return { provider, apiKey };
+}
+
+// ── Legacy helpers (kept for backward compatibility) ──
+
+export function getAvailableProviders(): LLMProviderConfig[] {
+  return Object.values(PROVIDER_CONFIGS);
+}
+
+export function getDefaultProvider(): LLMProvider {
+  return 'google';
 }

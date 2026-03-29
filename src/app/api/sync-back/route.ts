@@ -1,6 +1,5 @@
 import { generateText } from 'ai';
-import { getModel } from '@/lib/llm-providers';
-import type { LLMProvider } from '@/core/types';
+import { getModelWithKey, extractKeyFromHeaders } from '@/lib/llm-providers';
 import { buildPartialSyncBackPrompt } from '@/core/context-builder';
 import { findSectionBoundary, spliceSection } from '@/core/section-parser';
 
@@ -10,17 +9,25 @@ export const maxDuration = 60;
 const SYNC_BACK_SYSTEM = `You are an AI assistant. Rewrite the given section by integrating insights from the sub-conversation. Return ONLY the rewritten section — nothing else.`;
 
 export async function POST(req: Request) {
+  // Extract API key from headers (BYOK)
+  const { provider, apiKey } = extractKeyFromHeaders(req);
+
   const {
     originalAnswer,
     anchorText,
     subConversationHistory,
-    provider = 'google',
   }: {
     originalAnswer: string;
     anchorText: string;
     subConversationHistory: { role: string; content: string }[];
-    provider?: LLMProvider;
   } = await req.json();
+
+  if (!apiKey) {
+    return Response.json(
+      { error: 'API key is required. Please add your key in Settings.' },
+      { status: 401 },
+    );
+  }
 
   if (!originalAnswer || !anchorText || !subConversationHistory?.length) {
     return Response.json(
@@ -33,14 +40,13 @@ export async function POST(req: Request) {
   const boundary = findSectionBoundary(originalAnswer, anchorText);
 
   if (!boundary) {
-    // Fallback: if section detection fails, return error
     return Response.json(
       { error: 'Could not locate the anchor text section in the original answer' },
       { status: 422 },
     );
   }
 
-  const model = getModel(provider);
+  const model = getModelWithKey(provider, apiKey);
 
   const userPrompt = buildPartialSyncBackPrompt(
     boundary.content,
@@ -65,7 +71,6 @@ export async function POST(req: Request) {
 
     return Response.json({
       updatedAnswer,
-      // Include metadata for debugging/analytics
       _meta: {
         mode: 'partial',
         sectionLength: boundary.content.length,
