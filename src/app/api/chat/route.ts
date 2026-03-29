@@ -5,7 +5,7 @@ import { buildSubConversationSystemPrompt } from '@/core/context-builder';
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
 
-const SYSTEM_PROMPT = `You are Drill-Chat, an intelligent AI assistant.
+const SYSTEM_PROMPT = `You are Drill Chat, an intelligent AI assistant.
 You provide clear, well-structured answers using markdown formatting.
 When answering complex questions, break your response into numbered items or sections
 so users can easily identify and explore specific parts of your answer.

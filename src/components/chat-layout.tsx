@@ -97,7 +97,7 @@ export function ChatLayout({
           <div className="chat-logo">
             <Drill size={24} />
           </div>
-          <h1 className="chat-title">Drill-Chat</h1>
+          <h1 className="chat-title">Drill Chat</h1>
           <span className="chat-badge">alpha</span>
         </div>
         <div className="chat-header-right">

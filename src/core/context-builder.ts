@@ -18,7 +18,7 @@ export function buildSubConversationSystemPrompt(
   rootAnswer: string,
   anchorText: string,
 ): string {
-  return `You are Drill-Chat, an intelligent AI assistant.
+  return `You are Drill Chat, an intelligent AI assistant.
 
 The user is exploring a specific part of a previous AI answer in a sub-conversation.
 They selected the following text to drill into:

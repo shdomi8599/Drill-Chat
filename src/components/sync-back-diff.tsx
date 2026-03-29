@@ -34,7 +34,7 @@ export function SyncBackDiff({
   return (
     <div className="sync-diff">
       <div className="sync-diff-header">
-        <span className="sync-diff-badge">✨ Enhanced by Drill-Chat</span>
+        <span className="sync-diff-badge">✨ Enhanced by Drill Chat</span>
       </div>
       <div className="sync-diff-content">
         {segments.map((segment, i) => (

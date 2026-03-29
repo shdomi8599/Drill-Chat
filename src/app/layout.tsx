@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Drill-Chat — Changing the Depth of Conversation",
+  title: "Drill Chat — Changing the Depth of Conversation",
   description:
     "AI chat with inline sub-conversations and sync-back. Drill into any part of an AI answer to explore deeper.",
 };
