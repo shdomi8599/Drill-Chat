@@ -9,8 +9,8 @@ export const maxDuration = 60;
 const SYNC_BACK_SYSTEM = `You are an AI assistant. Rewrite the given section by integrating insights from the sub-conversation. Return ONLY the rewritten section — nothing else.`;
 
 export async function POST(req: Request) {
-  // Extract API key from headers (BYOK)
-  const { provider, apiKey } = extractKeyFromHeaders(req);
+  // Extract API key and modelId from headers (BYOK)
+  const { provider, apiKey, modelId } = extractKeyFromHeaders(req);
 
   const {
     originalAnswer,
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const model = getModelWithKey(provider, apiKey);
+  const model = getModelWithKey(provider, apiKey, modelId);
 
   const userPrompt = buildPartialSyncBackPrompt(
     boundary.content,

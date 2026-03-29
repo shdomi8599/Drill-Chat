@@ -410,14 +410,13 @@ body {
 .provider-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 10px;
+  padding: 0 12px;
+  height: 36px;
   border-radius: var(--radius-sm);
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 500;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -900,11 +899,16 @@ body {
   min-width: 0;
 }
 
-.sub-panel-header-info {
+.provider-info {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  align-items: center;
+  line-height: 1;
+}
+
+.provider-model-selected {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .sub-panel-label {
@@ -1334,6 +1338,11 @@ body {
   animation: pulse 2s ease-in-out infinite;
 }
 
+@keyframes modalIn {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 16px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
 .settings-backdrop {
   position: fixed;
   inset: 0;
@@ -1356,7 +1365,7 @@ body {
   box-shadow: var(--shadow-lg);
   z-index: 101;
   overflow-y: auto;
-  animation: popoverIn 0.2s ease-out;
+  animation: modalIn 0.2s ease-out;
 }
 
 .settings-header {
@@ -1421,18 +1430,37 @@ body {
 }
 .settings-label {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
+
 .settings-provider-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
 }
-.settings-model-name {
+
+.settings-model-select {
   font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
   color: var(--text-secondary);
-  font-family: var(--font-mono);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.settings-model-select:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.settings-model-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
 }
 
 .settings-input-row {
@@ -1525,3 +1553,102 @@ body {
   color: var(--accent);
   margin-left: auto;
 }
+
+/* ============================================
+   Provider Selector (Updated for Model-only)
+   ============================================ */
+
+.provider-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.provider-trigger:hover {
+  border-color: var(--accent);
+  background: var(--bg-tertiary);
+}
+
+.provider-info {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.provider-model-selected {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.provider-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 240px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  z-index: 100;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: popoverIn 0.2s ease-out;
+  backdrop-filter: blur(12px);
+}
+
+.provider-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.provider-option:not(.disabled):hover {
+  background: var(--bg-tertiary);
+}
+.provider-option.active {
+  background: var(--accent-subtle);
+}
+.provider-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.provider-option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.provider-option-model {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.provider-option-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(251, 113, 133, 0.1);
+  color: #fb7185;
+  border-radius: 4px;
+  font-weight: 600;
+}
+

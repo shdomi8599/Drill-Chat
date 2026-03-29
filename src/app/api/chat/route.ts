@@ -13,7 +13,7 @@ Be concise but thorough. Use headings, bullet points, and numbered lists where a
 
 export async function POST(req: Request) {
   // Extract API key from headers (BYOK)
-  const { provider, apiKey } = extractKeyFromHeaders(req);
+  const { provider, apiKey, modelId } = extractKeyFromHeaders(req);
 
   const body = await req.json();
 
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const model = getModelWithKey(provider, apiKey);
+  const model = getModelWithKey(provider, apiKey, modelId);
 
   if (isSubConversation && rootAnswer && anchorText && newUserMessage) {
     // ── Sub-conversation mode ──

@@ -43,6 +43,7 @@ export function useSubConversation(
     subConversations,
     provider,
     addSubMessage,
+    updateSubMessage,
     updateSubConvStatus,
     setSubConvLoading,
     getApiKeyHeader,
@@ -98,24 +99,25 @@ export function useSubConversation(
         const decoder = new TextDecoder();
         let fullContent = '';
 
+        // Add empty assistant message initially
+        const assistantMsg = createSubMessage('assistant', '');
+        addSubMessage(subConvId, assistantMsg);
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           fullContent += decoder.decode(value, { stream: true });
+          // Live update the message content
+          updateSubMessage(subConvId, assistantMsg.id, fullContent);
         }
 
-        // Add assistant message to store
-        if (fullContent) {
-          const assistantMsg = createSubMessage('assistant', fullContent);
-          addSubMessage(subConvId, assistantMsg);
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to send message');
       } finally {
         setSubConvLoading(subConvId, false);
       }
     },
-    [activeSubConversation, subConvId, messages, provider, addSubMessage, setSubConvLoading],
+    [activeSubConversation, subConvId, messages, provider, addSubMessage, updateSubMessage, setSubConvLoading],
   );
 
   /**

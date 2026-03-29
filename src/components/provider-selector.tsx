@@ -7,7 +7,7 @@ import type { LLMProvider } from '@/core/types';
 import { ChevronDown, Check } from 'lucide-react';
 
 export function ProviderSelector() {
-  const { provider, setProvider, apiKeys } = useChatStore();
+  const { provider, setProvider, apiKeys, selectedModels } = useChatStore();
   const [open, setOpen] = useState(false);
 
   const providers: LLMProvider[] = ['google', 'openai', 'anthropic'];
@@ -19,6 +19,9 @@ export function ProviderSelector() {
     setOpen(false);
   };
 
+  const currentModelId = selectedModels[provider];
+  const currentModel = current.models.find((m) => m.id === currentModelId) || current.models[0];
+
   return (
     <div className="provider-selector">
       <button
@@ -26,7 +29,9 @@ export function ProviderSelector() {
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <span className="provider-name">{current?.name ?? 'Select Model'}</span>
+        <div className="provider-info">
+          <span className="provider-model-selected">{currentModel.name}</span>
+        </div>
         <ChevronDown size={14} className={`provider-chevron ${open ? 'open' : ''}`} />
       </button>
 
@@ -44,8 +49,13 @@ export function ProviderSelector() {
                   onClick={() => hasKey && handleSelect(p)}
                   disabled={!hasKey}
                 >
-                  <span className="provider-option-name">{config.name}</span>
-                  <span className="provider-option-model">{config.model}</span>
+                  <div className="provider-option-content">
+                    <span className="provider-option-model">
+                      {selectedModels[p] 
+                        ? config.models.find(m => m.id === selectedModels[p])?.name 
+                        : config.models[0].name}
+                    </span>
+                  </div>
                   {!hasKey && (
                     <span className="provider-option-badge">No Key</span>
                   )}

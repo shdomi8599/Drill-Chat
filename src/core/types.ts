@@ -8,10 +8,17 @@
 
 export type LLMProvider = 'google' | 'openai' | 'anthropic';
 
+export interface LLMModelConfig {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface LLMProviderConfig {
   id: LLMProvider;
   name: string;
-  model: string;
+  defaultModelId: string;
+  models: LLMModelConfig[];
   available: boolean;
 }
 
@@ -124,6 +131,8 @@ export interface DiffSegment {
 export interface ChatRequest {
   messages: { role: 'user' | 'assistant' | 'system'; content: string }[];
   provider: LLMProvider;
+  /** Specific model ID to use (from selection) */
+  modelId?: string;
   /** If true, this is a sub-conversation request */
   isSubConversation?: boolean;
   /** The root answer for sub-conversation context */

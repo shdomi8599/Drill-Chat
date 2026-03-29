@@ -56,9 +56,12 @@ export function DrillableContent({
 
   // Custom renderers that add drill buttons
   const components: Components = {
-    li: ({ children, ...props }) => {
-      const text = extractTextFromChildren(children);
-      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
+    li: ({ node, children, ...props }) => {
+      // Use raw markdown text if positional info is available, otherwise fallback to plain text
+      const text = node?.position?.start?.offset !== undefined && node?.position?.end?.offset !== undefined
+        ? content.slice(node.position.start.offset, node.position.end.offset)
+        : extractTextFromChildren(children);
+      const activeInfo = activeAnchors.find((a) => text.trim() === a.text.trim());
 
       return (
         <li
@@ -97,9 +100,11 @@ export function DrillableContent({
         </li>
       );
     },
-    h2: ({ children, ...props }) => {
-      const text = extractTextFromChildren(children);
-      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
+    h2: ({ node, children, ...props }) => {
+      const text = node?.position?.start?.offset !== undefined && node?.position?.end?.offset !== undefined
+        ? content.slice(node.position.start.offset, node.position.end.offset)
+        : extractTextFromChildren(children);
+      const activeInfo = activeAnchors.find((a) => text.trim() === a.text.trim());
 
       return (
         <h2
@@ -134,9 +139,11 @@ export function DrillableContent({
         </h2>
       );
     },
-    h3: ({ children, ...props }) => {
-      const text = extractTextFromChildren(children);
-      const activeInfo = activeAnchors.find((a) => text.includes(a.text));
+    h3: ({ node, children, ...props }) => {
+      const text = node?.position?.start?.offset !== undefined && node?.position?.end?.offset !== undefined
+        ? content.slice(node.position.start.offset, node.position.end.offset)
+        : extractTextFromChildren(children);
+      const activeInfo = activeAnchors.find((a) => text.trim() === a.text.trim());
 
       return (
         <h3

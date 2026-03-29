@@ -19,8 +19,7 @@ export default function Home() {
     useChat({
       transport: new DefaultChatTransport({
         api: '/api/chat',
-        body: { provider },
-        headers: getApiKeyHeader(),
+        headers: () => getApiKeyHeader(),
       }),
     });
 
