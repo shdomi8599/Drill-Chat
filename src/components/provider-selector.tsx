@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useChatStore } from '@/lib/chat-store';
-import type { LLMProvider, LLMProviderConfig } from '@/lib/types';
+import type { LLMProvider, LLMProviderConfig } from '@/core/types';
 import { ChevronDown } from 'lucide-react';
 
 export function ProviderSelector() {

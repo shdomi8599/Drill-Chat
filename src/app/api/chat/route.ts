@@ -1,6 +1,7 @@
 import { streamText, UIMessage, convertToModelMessages } from 'ai';
 import { getModel } from '@/lib/llm-providers';
-import type { LLMProvider } from '@/lib/types';
+import type { LLMProvider } from '@/core/types';
+import { buildSubConversationSystemPrompt } from '@/core/context-builder';
 
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
@@ -12,15 +13,52 @@ so users can easily identify and explore specific parts of your answer.
 Be concise but thorough. Use headings, bullet points, and numbered lists where appropriate.`;
 
 export async function POST(req: Request) {
+  const body = await req.json();
+
   const {
     messages,
     provider = 'google',
+    // Sub-conversation fields
+    isSubConversation = false,
+    rootAnswer,
+    anchorText,
+    subMessages: subMsgs,
+    newUserMessage,
   }: {
-    messages: UIMessage[];
+    messages?: UIMessage[];
     provider?: LLMProvider;
-  } = await req.json();
+    isSubConversation?: boolean;
+    rootAnswer?: string;
+    anchorText?: string;
+    subMessages?: { role: 'user' | 'assistant'; content: string }[];
+    newUserMessage?: string;
+  } = body;
 
   const model = getModel(provider);
+
+  if (isSubConversation && rootAnswer && anchorText && newUserMessage) {
+    // ── Sub-conversation mode ──
+    // Build a separate message history with sub-conversation context
+    const systemPrompt = buildSubConversationSystemPrompt(rootAnswer, anchorText);
+
+    const subConvMessages: { role: 'user' | 'assistant'; content: string }[] = [
+      ...(subMsgs || []),
+      { role: 'user' as const, content: newUserMessage },
+    ];
+
+    const result = streamText({
+      model,
+      system: systemPrompt,
+      messages: subConvMessages,
+    });
+
+    return result.toTextStreamResponse();
+  }
+
+  // ── Standard chat mode ──
+  if (!messages) {
+    return new Response('Missing messages', { status: 400 });
+  }
 
   const result = streamText({
     model,

@@ -7,7 +7,7 @@
 import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
-import type { LLMProvider, LLMProviderConfig } from './types';
+import type { LLMProvider, LLMProviderConfig } from '@/core/types';
 
 // ── Provider Configurations ──
 
@@ -15,7 +15,7 @@ export const PROVIDER_CONFIGS: Record<LLMProvider, LLMProviderConfig> = {
   google: {
     id: 'google',
     name: 'Google Gemini',
-    model: 'gemini-3.1-flash-preview',
+    model: 'gemini-3.1-flash-lite-preview',
     available: false,
   },
   openai: {
@@ -73,17 +73,3 @@ export function getModel(provider: LLMProvider) {
       throw new Error(`Unknown provider: ${provider}`);
   }
 }
-
-// ── Sync-back system prompt ──
-
-export const SYNC_BACK_SYSTEM_PROMPT = `You are an AI assistant helping to integrate information from a sub-conversation back into an original answer.
-
-The user explored a specific part of your previous answer in a sub-conversation. Now they want to sync the insights back into the original answer.
-
-Rules:
-1. Update ONLY the relevant section (the anchor text area) with the new information
-2. Keep the rest of the original answer unchanged
-3. Make the updated section richer and more detailed based on the sub-conversation
-4. Maintain the same formatting style as the original answer
-5. Mark the updated section naturally — don't add artificial markers
-6. Respond with the COMPLETE updated answer (not just the changed part)`;

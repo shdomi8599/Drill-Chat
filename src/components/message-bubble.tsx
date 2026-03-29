@@ -1,23 +1,51 @@
 'use client';
 
+// ============================================
+// Drill-Chat — Message Bubble
+// ============================================
+// Renders individual chat messages with drill-down
+// capabilities for assistant messages.
+
+import { useRef, useCallback } from 'react';
 import type { UIMessage } from 'ai';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { User, Bot } from 'lucide-react';
+import { DrillableContent } from './drillable-content';
+import { TextSelectionPopover } from './text-selection-popover';
+import { User, Bot, MessageSquare } from 'lucide-react';
+import { useChatStore } from '@/lib/chat-store';
+import type { DrillTarget, SubConversation } from '@/core/types';
 
 interface MessageBubbleProps {
   message: UIMessage;
   isStreaming?: boolean;
+  onDrill?: (messageId: string, content: string, target: DrillTarget) => void;
 }
 
-export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming, onDrill }: MessageBubbleProps) {
   const isUser = message.role === 'user';
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { getSubConversationsForMessage } = useChatStore();
 
   // Extract text content from message parts
   const textContent = message.parts
     .filter((part): part is Extract<typeof part, { type: 'text' }> => part.type === 'text')
     .map((part) => part.text)
     .join('');
+
+  // Get sub-conversations for this message
+  const subConvs = getSubConversationsForMessage(message.id);
+  const activeAnchors = subConvs
+    .filter((sc: SubConversation) => sc.status === 'active')
+    .map((sc: SubConversation) => sc.anchorText);
+  const syncedAnchors = subConvs
+    .filter((sc: SubConversation) => sc.status === 'synced')
+    .map((sc: SubConversation) => sc.anchorText);
+
+  const handleDrill = useCallback(
+    (target: DrillTarget) => {
+      onDrill?.(message.id, textContent, target);
+    },
+    [message.id, textContent, onDrill],
+  );
 
   return (
     <div className={`message ${isUser ? 'message-user' : 'message-assistant'}`}>
@@ -27,16 +55,47 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
       </div>
 
       {/* Content */}
-      <div className={`message-content ${isUser ? 'content-user' : 'content-assistant'}`}>
+      <div
+        ref={contentRef}
+        className={`message-content ${isUser ? 'content-user' : 'content-assistant'}`}
+      >
         {isUser ? (
           <p>{textContent}</p>
         ) : (
-          <div className="markdown-body">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {textContent}
-            </ReactMarkdown>
+          <>
+            <DrillableContent
+              content={textContent}
+              onDrill={handleDrill}
+              drillEnabled={!isStreaming}
+              activeAnchors={activeAnchors}
+            />
             {isStreaming && <span className="streaming-cursor" />}
-          </div>
+
+            {/* Sub-conversation indicators */}
+            {subConvs.length > 0 && (
+              <div className="message-sub-indicators">
+                {subConvs.map((sc: SubConversation) => (
+                  <span
+                    key={sc.id}
+                    className={`sub-indicator sub-indicator-${sc.status}`}
+                    title={`"${sc.anchorText.slice(0, 30)}…" — ${sc.status}`}
+                  >
+                    <MessageSquare size={10} />
+                    <span>{sc.status === 'synced' ? 'Synced' : 'Active'}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Text selection popover for drill via drag */}
+        {!isUser && !isStreaming && (
+          <TextSelectionPopover
+            containerRef={contentRef}
+            messageContent={textContent}
+            onDrill={handleDrill}
+          />
         )}
       </div>
     </div>
