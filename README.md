@@ -25,7 +25,7 @@ I didn't build this to promote my product. I built it because **I was frustrated
 
 Every time I use ChatGPT, Claude, or Gemini, I run into the same problems:
 
-1. **I want to explore one specific point** in the AI's answer — but asking a follow-up question means the AI generates an entirely *new* response, burning output tokens and losing focus on everything else.
+1. **I want to explore one specific point** in the AI's answer — but asking a follow-up question means the AI generates an entirely _new_ response, burning output tokens and losing focus on everything else.
 
 2. **Conversations drift.** After 3-4 exchanges, I've forgotten what the original answer even said. I scroll back up, try to mentally stitch context together, or ask the AI to "summarize everything so far" — wasting even more time and tokens.
 
@@ -48,7 +48,7 @@ You:  "Wait, what were the other 4 again?"
 AI:   (lost context, you scroll up, start over)
 ```
 
-**The core issue:** When you want to dig deeper into *one part* of an answer, the entire conversation resets around that single topic. The original answer — the big picture — gets abandoned.
+**The core issue:** When you want to dig deeper into _one part_ of an answer, the entire conversation resets around that single topic. The original answer — the big picture — gets abandoned.
 
 ### What Drill Chat Does Differently
 
@@ -81,7 +81,7 @@ Click the **Drill** button on any list item, heading, or drag-select any text in
 
 ### 🔄 Surgical Sync-Back
 
-When you're done exploring, click **"Sync back"**. Drill Chat uses a markdown section parser to identify only the relevant section and rewrites *just that part* — not the entire answer. This reduces output tokens by up to **~75%** compared to full regeneration.
+When you're done exploring, click **"Sync back"**. Drill Chat uses a markdown section parser to identify only the relevant section and rewrites _just that part_ — not the entire answer. This reduces output tokens by up to **~75%** compared to full regeneration.
 
 <p align="center">
   <img src="./docs/assets/04-sync-back.png" alt="Sync-back Result" width="100%" />
@@ -110,36 +110,38 @@ Your API keys are stored in your browser's localStorage only — **never sent to
 
 ## 🆚 Before / After
 
-| | Traditional AI Chat | Drill Chat |
-|---|---|---|
-| **Exploring a specific point** | Generate a new message → lose big picture | Drill inline → original stays visible |
-| **After 5+ exchanges** | Scroll up, re-read, "summarize so far" | Original answer is always right there |
-| **Enriching one section** | Regenerate entire answer (100% tokens) | Sync-back rewrites only that section (~25% tokens) |
-| **Managing context** | Linear — everything in one thread | Tree — parallel explorations, no interference |
+|                                | Traditional AI Chat                       | Drill Chat                                         |
+| ------------------------------ | ----------------------------------------- | -------------------------------------------------- |
+| **Exploring a specific point** | Generate a new message → lose big picture | Drill inline → original stays visible              |
+| **After 5+ exchanges**         | Scroll up, re-read, "summarize so far"    | Original answer is always right there              |
+| **Enriching one section**      | Regenerate entire answer (100% tokens)    | Sync-back rewrites only that section (~25% tokens) |
+| **Managing context**           | Linear — everything in one thread         | Tree — parallel explorations, no interference      |
 
 ---
 
 ## 🛠 Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| LLM Integration | Vercel AI SDK |
-| State Management | Zustand |
-| Styling | CSS (Custom Design System) |
-| Markdown | react-markdown + remark-gfm |
-| Deployment | Vercel |
+| Category         | Technology                  |
+| ---------------- | --------------------------- |
+| Framework        | Next.js 16 (App Router)     |
+| Language         | TypeScript                  |
+| LLM Integration  | Vercel AI SDK               |
+| State Management | Zustand                     |
+| Styling          | CSS (Custom Design System)  |
+| Markdown         | react-markdown + remark-gfm |
+| Deployment       | Vercel                      |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - An API key from at least one provider (Google, OpenAI, or Anthropic)
 
 ### Option 1: Use the Live Demo
+
 Visit **[drill-chat.vercel.app](https://drill-chat.vercel.app)**, click the ⚙️ Settings icon, enter your API key, and start chatting.
 
 ### Option 2: Run Locally
@@ -161,16 +163,6 @@ Open [http://localhost:3000](http://localhost:3000) — click ⚙️ to enter yo
 
 - [Concept Document](./docs/sub_tasker_concept.md) — The original idea and UX design rationale
 - [Roadmap](./docs/drill_chat_roadmap.md) — Full development roadmap and strategic decisions
-
----
-
-## 🗺 Roadmap
-
-- [x] **Phase 0** — Project setup, concept documentation
-- [x] **Phase 1** — Core prototype (Chat + Drill-down + Sync-back + Multi-LLM)
-- [ ] **Phase 2** — Community validation ← *You are here*
-- [ ] **Phase 3** — Open-source expansion (npm library, PRs to LibreChat/Open WebUI/LobeChat)
-- [ ] **Phase 4** — Advanced features (Conversation export, collaboration, plugin system)
 
 ---
 
