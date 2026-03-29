@@ -124,7 +124,33 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
-  closeSubConversation: () => set({ activeSubConversation: null }),
+  closeSubConversation: () => {
+    const { activeSubConversation, subConversations, messageSubConvMap } = get();
+
+    if (activeSubConversation) {
+      const { subConvId, messageId } = activeSubConversation;
+      const sc = subConversations[subConvId];
+
+      // Remove sub-conversation if no messages were exchanged (empty drill)
+      if (sc && sc.messages.length === 0) {
+        const { [subConvId]: _, ...restSubConvs } = subConversations;
+        const updatedIds = (messageSubConvMap[messageId] || []).filter(
+          (id) => id !== subConvId,
+        );
+        set({
+          activeSubConversation: null,
+          subConversations: restSubConvs,
+          messageSubConvMap: {
+            ...messageSubConvMap,
+            [messageId]: updatedIds,
+          },
+        });
+        return;
+      }
+    }
+
+    set({ activeSubConversation: null });
+  },
 
   // ── Sub-conversation Data ──
   subConversations: {},

@@ -182,7 +182,7 @@ export function SubConversationPanel({
             </div>
           ))}
           {isLoading && (
-            <div className="sub-msg sub-msg-assistant">
+            <div className="sub-msg sub-msg-thinking">
               <div className="thinking-dots">
                 <span />
                 <span />
