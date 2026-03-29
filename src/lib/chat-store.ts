@@ -60,6 +60,7 @@ interface ChatState {
     syncedContent?: string,
     originalContent?: string,
   ) => void;
+  setSubConvLoading: (subConvId: string, isLoading: boolean) => void;
   getSubConversationsForMessage: (messageId: string) => SubConversation[];
 
   // ── Message → SubConversation mapping ──
@@ -218,6 +219,21 @@ export const useChatStore = create<ChatState>((set, get) => ({
             status,
             ...(syncedContent !== undefined && { syncedContent }),
             ...(originalContent !== undefined && { originalContent }),
+          },
+        },
+      };
+    }),
+
+  setSubConvLoading: (subConvId, isLoading) =>
+    set((s) => {
+      const sc = s.subConversations[subConvId];
+      if (!sc) return s;
+      return {
+        subConversations: {
+          ...s.subConversations,
+          [subConvId]: {
+            ...sc,
+            isLoading,
           },
         },
       };

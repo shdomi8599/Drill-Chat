@@ -31,6 +31,8 @@ export interface SubConversation {
   syncedContent?: string;
   /** The original content before sync-back (for diff) */
   originalContent?: string;
+  /** Whether the sub-conversation is currently waiting for AI response */
+  isLoading?: boolean;
  /** Order in messages (1-based index) */
   index: number;
   /** Assigned theme color (hex or CSS variable) */

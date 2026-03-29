@@ -36,7 +36,6 @@ interface UseSubConversationReturn {
 export function useSubConversation(
   options: UseSubConversationOptions = {},
 ): UseSubConversationReturn {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -45,6 +44,7 @@ export function useSubConversation(
     provider,
     addSubMessage,
     updateSubConvStatus,
+    setSubConvLoading,
     closeSubConversation,
     syncBackInProgress,
     setSyncBackInProgress,
@@ -63,7 +63,7 @@ export function useSubConversation(
       if (!activeSubConversation || !subConvId) return;
 
       setError(null);
-      setIsLoading(true);
+      setSubConvLoading(subConvId, true);
 
       // Add user message to store
       const userMsg = createSubMessage('user', text);
@@ -111,10 +111,10 @@ export function useSubConversation(
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to send message');
       } finally {
-        setIsLoading(false);
+        setSubConvLoading(subConvId, false);
       }
     },
-    [activeSubConversation, subConvId, messages, provider, addSubMessage],
+    [activeSubConversation, subConvId, messages, provider, addSubMessage, setSubConvLoading],
   );
 
   /**
@@ -183,7 +183,7 @@ export function useSubConversation(
     sendMessage,
     syncBack,
     close,
-    isLoading,
+    isLoading: !!subConv?.isLoading,
     isSyncing: syncBackInProgress,
     error,
   };
