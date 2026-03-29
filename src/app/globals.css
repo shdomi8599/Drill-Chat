@@ -749,9 +749,11 @@ body {
 }
 
 .text-selection-popover-btn:hover {
-  background: var(--accent-subtle);
+  background: var(--accent);
+  color: #ffffff;
   border-color: var(--accent);
-  color: var(--accent);
+  box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+  transform: translateY(-2px);
 }
 
 /* ============================================

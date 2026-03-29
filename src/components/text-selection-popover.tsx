@@ -36,8 +36,12 @@ export function TextSelectionPopover({
   const [position, setPosition] = useState<PopoverPosition | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e: MouseEvent) => {
     if (!enabled) return;
+
+    // Capture the exact mouse coordinates where the drag ended
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
 
     // Small delay to let the selection finalize
     setTimeout(() => {
@@ -64,14 +68,10 @@ export function TextSelectionPopover({
         return;
       }
 
-      // Position the popover above the selection
-      const rect = range.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-
       setSelectedText(text);
       setPosition({
-        top: rect.top - containerRect.top - 44,
-        left: rect.left - containerRect.left + rect.width / 2,
+        top: mouseY - 44, // 44px above the cursor in viewport
+        left: mouseX, // Exactly at cursor horizontal in viewport
       });
     }, 10);
   }, [enabled, containerRef]);
@@ -126,6 +126,7 @@ export function TextSelectionPopover({
       ref={popoverRef}
       className="text-selection-popover"
       style={{
+        position: 'fixed',
         top: position.top,
         left: position.left,
       }}
