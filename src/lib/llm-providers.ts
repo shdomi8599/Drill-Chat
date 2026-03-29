@@ -15,7 +15,7 @@ export const PROVIDER_CONFIGS: Record<LLMProvider, LLMProviderConfig> = {
   google: {
     id: 'google',
     name: 'Google Gemini',
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.1-flash-preview',
     available: false,
   },
   openai: {
